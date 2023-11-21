@@ -7,4 +7,8 @@ module.exports = function (app, blogData) {
   app.get("/", function (req, res) {
     res.render("index.ejs", { user: req.session.user });
   });
+
+  app.get("/about", function (req, res) {
+    res.render("about.ejs", blogData);
+  });
 };

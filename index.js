@@ -48,7 +48,7 @@ app.set("view engine", "ejs");
 
 // Tells Express how we should process html files
 // We want to use EJS's rendering engine
-app.engine("html, ejs.renderFile");
+app.engine("html", ejs.renderFile);
 
 // Define our data
 var tipData = { blogName: "GreenTips" };

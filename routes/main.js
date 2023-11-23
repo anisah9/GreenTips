@@ -103,6 +103,16 @@ module.exports = function (app, blogData) {
     });
   });
 
+  app.post("/logout", function (req, res) {
+    req.session.destroy(function (err) {
+      if (err) {
+        console.error("Error logging out", err);
+        return res.status(500).json({ message: "Internal Server Error" });
+      }
+      res.redirect("/");
+    });
+  });
+
   app.get("/submitTip", function (req, res) {
     res.render("submitTip.ejs");
   });
@@ -143,7 +153,7 @@ module.exports = function (app, blogData) {
   app.get("/tips", function (req, res) {
     // Retrieve tips from the database
     const sql =
-      "SELECT * FROM tips, users.username FROM tips JOIN users ON tips.userID = users.id";
+      "SELECT tips.*, users.username FROM tips JOIN users ON tips.userID = users.id";
     db.query(sql, function (err, tips) {
       if (err) {
         console.error("Error retrieving tips:", err);

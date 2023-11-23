@@ -138,8 +138,7 @@ module.exports = function (app, blogData) {
     }
 
     // Save the tip to the database, associating it with the current user
-    const sql =
-      "INSERT INTO tips (category, text, image, link, userID) VALUES(?, ?, ?, ?, ?)";
+    const sql = `INSERT INTO tips (category, text, image, link, userId) VALUES (?, ?, ?, ?, ?)`;
     const values = [tipCategory, tipText, tipImage, tipLink, currentUser.id];
 
     db.query(sql, values, function (err, result) {
@@ -149,7 +148,7 @@ module.exports = function (app, blogData) {
       }
 
       console.log("Tip submitted successfully");
-      res.redirect("/tips"); //Redirect to a page that displays all the tips
+      res.redirect("/tips/" + tipCategory); //Redirect to a page that displays all the tips
     });
   });
 
@@ -165,6 +164,22 @@ module.exports = function (app, blogData) {
 
       // Render the tips page with the retrieved tips
       res.render("tips.ejs", { tips });
+    });
+  });
+
+  // New route to handle tips for a specific category
+  app.get("/tips/:category", function (req, res) {
+    const category = req.params.category;
+
+    const sql =
+      "SELECT tips.*, users.username FROM tips JOIN users ON tips.userId = users.id WHERE tips.category = ?";
+    db.query(sql, [category], function (err, tips) {
+      if (err) {
+        console.error("Error retrieving tips:", err);
+        return res.status(500).json({ message: "Internal Server Error" });
+      }
+
+      res.render("category.ejs", { category, tips });
     });
   });
 };

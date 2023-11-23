@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="main.css" />
+    <title><%= category %> Tips</title>
+  </head>
+  <body>
+    <h1><%= category %> Eco-Friendly Tips</h1>
+
+    <% for (let tip of tips) { %>
+    <div>
+      <p><%= tip.text %></p>
+
+      <% if (tip.image) { %>
+      <img src="<%= tip.image %>" alt="Tip Image" />
+      <% } %> <% if (tip.link) { %>
+      <a href="<%= tip.link %>" target="_blank">Read more</a>
+      <% } %>
+
+      <p>Submitted by: <%= tip.username %></p>
+    </div>
+    <% } %>
+  </body>
+</html>

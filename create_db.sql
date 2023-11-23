@@ -16,7 +16,7 @@ CREATE TABLE users (
   password VARCHAR(255) NOT NULL
 );
 
-# Create the 'users' table
+# Create the 'tips' table
 CREATE TABLE tips (
   id INT AUTO_INCREMENT PRIMARY KEY,
   category VARCHAR(255) NOT NULL,

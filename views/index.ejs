@@ -6,16 +6,24 @@
   <body>
     <h1>Welcome to the Eco-Friendly Tips Web App</h1>
 
-    <!-- Check if the user is logged in -->
-    <% if (user) { %>
-    <!-- Show logout button if logged in  -->
-    <form action="logout" method="post">
-      <button type="submit">Logout</button>
-    </form>
-    <% } else { %>
-    <!-- Show registration and login buttons if not logged in -->
-    <a href="/register">Register</a>
-    <a href="/login">Login</a>
-    <% } %>
+    <!-- Navigation Links -->
+    <nav>
+      <a href="/about">About</a>
+      <a href="/tips">Tips</a>
+
+      <!-- Check if the user is logged in -->
+      <% if (user) { %>
+      <!-- Show a Submit a Tip link if logged in -->
+      <a href="/submitTip">Submit a Tip</a>
+      <!-- Show logout button if logged in  -->
+      <form action="logout" method="post">
+        <button type="submit">Logout</button>
+      </form>
+      <% } else { %>
+      <!-- Show registration and login buttons if not logged in -->
+      <a href="/register">Register</a>
+      <a href="/login">Login</a>
+      <% } %>
+    </nav>
   </body>
 </html>

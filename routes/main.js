@@ -114,6 +114,9 @@ module.exports = function (app, blogData) {
   });
 
   app.get("/submitTip", function (req, res) {
+    if (!req.session.user) {
+      return res.redirect("/login");
+    }
     res.render("submitTip.ejs");
   });
 

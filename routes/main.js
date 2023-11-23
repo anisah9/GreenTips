@@ -142,7 +142,8 @@ module.exports = function (app, blogData) {
 
   app.get("/tips", function (req, res) {
     // Retrieve tips from the database
-    const sql = "SELECT * FROM tips";
+    const sql =
+      "SELECT * FROM tips, users.username FROM tips JOIN users ON tips.userID = users.id";
     db.query(sql, function (err, tips) {
       if (err) {
         console.error("Error retrieving tips:", err);

@@ -11,6 +11,7 @@
     <div>
       <h3><%= tip.category %></h3>
       <p><%= tip.text %></p>
+      <p>Submitted by: <%= tip.username %></p>
       <% if (tip.image) { %>
       <img src="<%= tip.image %>" alt="Tip Image" />
       <% } %> <% if (tip.link) { %>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="main.css" />
+    <title>All Tips</title>
+  </head>
+  <body>
+    <h1>All Eco-Friendly Tips</h1>
+
+    <% for (let tip of tips) { %>
+    <div>
+      <h3><%= tip.category %></h3>
+      <p><%= tip.text %></p>
+      <% if (tip.image) { %>
+      <img src="<%= tip.image %>" alt="Tip Image" />
+      <% } %> <% if (tip.link) { %>
+      <a href="<%= tip.link %>" target="_blank">Learn More</a>
+      <% } %>
+    </div>
+    <% } %>
+  </body>
+</html>

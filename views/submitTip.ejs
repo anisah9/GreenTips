@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="main.css" />
+    <title>Submit Tip</title>
+  </head>
+
+  <body>
+    <h1>Submit Eco-Friendly Tip</h1>
+    <form action="/submitTip" method="post">
+      <label for="tipCategory">Category:</label>
+      <input type="text" id="tipCategory" name="tipCategory" required />
+      <br />
+      <label for="tipText">Tip:</label>
+      <textarea id="tipText" name="tipText" required></textarea>
+      <br />
+      <label for="tipImage">Image URL (optional):</label>
+      <input type="text" id="tipImage" name="tipImage" />
+      <br />
+      <label for="tipLink">Link (optional)</label>
+      <input type="text" id="tipLink" name="tipLink" />
+      <br />
+      <button type="submit">Submit Tip</button>
+    </form>
+  </body>
+</html>

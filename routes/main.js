@@ -102,4 +102,55 @@ module.exports = function (app, blogData) {
       }
     });
   });
+
+  app.get("/submitTip", function (req, res) {
+    res.render("submitTip.ejs");
+  });
+
+  app.post("/submitTip", function (req, res) {
+    const { tipCategory, tipText, tipImage, tipLink } = req.body;
+
+    if (!tipCategory || !tipText) {
+      return res
+        .status(400)
+        .json({ message: "Category and tip text required" });
+    }
+
+    // Get user information from the session
+    const currentUser = req.session.user;
+
+    if (!currentUser) {
+      // Redirect to login if user is not logged in
+      return res.redirect("/login");
+    }
+
+    // Save the tip to the database, associating it with the current user
+    const sql =
+      "INSERT INTO tips (category, text, image, link, userID) VALUES(?, ?, ?, ?, ?)";
+    const values = [tipCategory, tipText, tipImage, tipLink, currentUser.id];
+
+    db.query(sql, values, function (err, result) {
+      if (err) {
+        console.error("Error submitting tip:", err);
+        return res.status(500).json({ message: "Internal Server Error" });
+      }
+
+      console.log("Tip submitted successfully");
+      res.redirect("/tips"); //Redirect to a page that displays all the tips
+    });
+  });
+
+  app.get("/tips", function (req, res) {
+    // Retrieve tips from the database
+    const sql = "SELECT * FROM tips";
+    db.query(sql, function (err, tips) {
+      if (err) {
+        console.error("Error retrieving tips:", err);
+        return res.status(500).json({ message: "Internal Server Error" });
+      }
+
+      // Render the tips page with the retrieved tips
+      res.render("tips.ejs", { tips });
+    });
+  });
 };

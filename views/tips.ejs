@@ -8,10 +8,21 @@
     <h1>All Eco-Friendly Tips</h1>
 
     <% for (let tip of tips) { %>
+    <!-- <div>
+      <h3><%= tip.category %></h3>
+      <p><%= tip.text %></p>
+      <p>Submitted by: <%= tip.username %></p>
+      <% if (tip.image) { %>
+      <img src="<%= tip.image %>" alt="Tip Image" />
+      <% } %> <% if (tip.link) { %>
+      <a href="<%= tip.link %>" target="_blank">Learn More</a>
+      <% } %>
+    </div> -->
     <div>
       <h3><%= tip.category %></h3>
       <p><%= tip.text %></p>
       <p>Submitted by: <%= tip.username %></p>
+      <p>Created at: <%= tip.formattedCreatedAt %></p>
       <% if (tip.image) { %>
       <img src="<%= tip.image %>" alt="Tip Image" />
       <% } %> <% if (tip.link) { %>

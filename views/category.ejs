@@ -1,3 +1,4 @@
+<!-- category.ejs -->
 <!DOCTYPE html>
 <html>
   <head>
@@ -7,17 +8,29 @@
   <body>
     <h1><%= category %> Eco-Friendly Tips</h1>
 
+    <!-- Display tips retrieved from the database for the specified category -->
     <% for (let tip of tips) { %>
     <div>
+      <!-- Display tip details -->
       <p><%= tip.text %></p>
 
+      <!-- Check if there is an image URL -->
       <% if (tip.image) { %>
       <img src="<%= tip.image %>" alt="Tip Image" />
-      <% } %> <% if (tip.link) { %>
+      <% } %>
+
+      <!-- Check if there is a link -->
+      <% if (tip.link) { %>
       <a href="<%= tip.link %>" target="_blank">Read more</a>
       <% } %>
 
+      <!-- Display the name of the user -->
       <p>Submitted by: <%= tip.username %></p>
+
+      <form action="/upvote/<%= tip.id %>" method="post">
+        <button type="submit">Upvote</button>
+      </form>
+      <p>Upvotes: <%= tip.upvotes %></p>
     </div>
     <% } %>
   </body>

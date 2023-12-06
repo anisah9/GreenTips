@@ -16,7 +16,7 @@ CREATE TABLE users (
   password VARCHAR(255) NOT NULL
 );
 
-# Create the 'tips' table
+
 CREATE TABLE tips (
   id INT AUTO_INCREMENT PRIMARY KEY,
   category VARCHAR(255) NOT NULL,
@@ -24,11 +24,11 @@ CREATE TABLE tips (
   image VARCHAR(255),
   link VARCHAR(255),
   userID INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  upvotes INT NOT NULL DEFAULT 0,
+  keywords VARCHAR(255),
   FOREIGN KEY (userID) REFERENCES users(id)
 );
-
-ALTER TABLE tips
-ADD COLUMN upvotes INT NOT NULL DEFAULT 0;
 
 
 # Create the upvotes table

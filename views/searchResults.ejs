@@ -1,0 +1,20 @@
+<!-- searchResults.ejs -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="main.css" />
+    <title>Search Results</title>
+  </head>
+  <body>
+    <h1>Search Results for "<%= query %>"</h1>
+
+    <!-- Display search results -->
+    <% for (let tip of tips) { %>
+    <!-- Render each tip as needed -->
+    <div>
+      <h2><%= tip.text %></h2>
+      <!-- Include other tip details as needed -->
+    </div>
+    <% } %>
+  </body>
+</html>

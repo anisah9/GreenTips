@@ -390,4 +390,26 @@ module.exports = function (app, blogData) {
     // Render the maps.ejs file
     res.render("maps.ejs");
   });
+
+  // Add this route to check username availability
+  app.get("/check-username", function (req, res) {
+    const username = req.query.username;
+
+    // Query the database to check if the username already exists
+    const checkUsernameSql = "SELECT * FROM users WHERE username = ?";
+    db.query(checkUsernameSql, [username], function (err, results) {
+      if (err) {
+        console.error("Error checking username:", err);
+        return res.status(500).json({ message: "Internal Server Error" });
+      }
+
+      if (results.length > 0) {
+        // Username already exists
+        return res.json({ exists: true });
+      }
+
+      // Username is available
+      return res.json({ exists: false });
+    });
+  });
 };

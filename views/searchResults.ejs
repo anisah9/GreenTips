@@ -4,6 +4,7 @@
     <link rel="stylesheet" type="text/css" href="main.css" />
     <title>Search Results</title>
   </head>
+
   <body>
     <h1>Search Results for "<%= query %>"</h1>
 
@@ -12,11 +13,6 @@
     <!-- Render each tip with all details -->
     <div>
       <h2><%= tip.text %></h2>
-
-      <!-- Check if there is an image URL -->
-      <% if (tip.image) { %>
-      <img src="<%= tip.image %>" alt="Tip Image" />
-      <% } %>
 
       <!-- Check if there is a link -->
       <% if (tip.link) { %>

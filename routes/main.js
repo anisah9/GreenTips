@@ -158,18 +158,10 @@ module.exports = function (app, blogData) {
   });
 
   app.get("/submitTip", function (req, res) {
-    // Check if the user is logged in
-    if (!req.session.user) {
-      // Redirect to the login page if not logged in
-      return res.redirect("/login");
-    }
-
-    // Render the "Submit a Tip" page if logged in
     res.render("submitTip.ejs");
   });
-
   app.post("/submitTip", function (req, res) {
-    const { tipCategory, tipText, tipImage, tipLink } = req.body;
+    const { tipCategory, tipText, tipLink } = req.body;
 
     if (!tipCategory || !tipText) {
       return res
@@ -186,16 +178,14 @@ module.exports = function (app, blogData) {
       return res.redirect("/login");
     }
 
-    // Save the tip to the database, associating it with the current user
-    const sql = `INSERT INTO tips (category, text, image, link, userId, upvotes, keywords) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    // Save the tip to the database
+    const sql = `INSERT INTO tips (category, text, link, userId, upvotes, keywords) VALUES (?, ?, ?, ?, ?, ?)`;
     const values = [
       tipCategory,
       tipText,
-      tipImage,
       tipLink,
       currentUser.id,
       0,
-      new Date(),
       "keyword1, keyword2",
     ];
 
@@ -209,6 +199,7 @@ module.exports = function (app, blogData) {
       res.redirect("/tips/" + tipCategory); // Redirect to a page that displays all tips
     });
   });
+
   app.get("/tips/:category", function (req, res) {
     const category = req.params.category;
 

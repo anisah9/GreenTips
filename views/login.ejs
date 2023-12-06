@@ -3,6 +3,20 @@
   <head>
     <link rel="stylesheet" type="text/css" href="main.css" />
     <title>Login</title>
+    <script>
+      // Function to display a window alert for incorrect password
+      function showIncorrectPasswordAlert() {
+        alert("Incorrect username or password");
+      }
+
+      // Check if the URL has a query parameter for an authentication error
+      window.onload = function () {
+        var urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has("error") && urlParams.get("error") === "auth") {
+          showIncorrectPasswordAlert();
+        }
+      };
+    </script>
   </head>
   <body>
     <h1>Login</h1>

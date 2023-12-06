@@ -157,6 +157,7 @@ module.exports = function (app, blogData) {
     });
   });
 
+  //Submit Tip page
   app.get("/submitTip", function (req, res) {
     res.render("submitTip.ejs");
   });
@@ -200,6 +201,7 @@ module.exports = function (app, blogData) {
     });
   });
 
+  //Category Page
   app.get("/tips/:category", function (req, res) {
     const category = req.params.category;
 
@@ -223,6 +225,7 @@ module.exports = function (app, blogData) {
     });
   });
 
+  //Tips Page
   app.get("/tips", function (req, res) {
     const user = req.session.user || null;
     const sortBy = req.query.sortBy || "created_at";
@@ -247,6 +250,7 @@ module.exports = function (app, blogData) {
     });
   });
 
+  //Upvote Page
   app.post("/upvote/:tipId", function (req, res) {
     const tipId = req.params.tipId;
 
@@ -300,6 +304,7 @@ module.exports = function (app, blogData) {
     });
   });
 
+  //Search Page
   app.get("/search", function (req, res) {
     const query = req.query.q; // Assuming the search query is passed as a query parameter
 
@@ -322,6 +327,7 @@ module.exports = function (app, blogData) {
     });
   });
 
+  //Airpollution API
   app.get("/airpollution", function (req, res) {
     let apiKey = "1aef0792cad95761fc691e7c8546da70";
     let latitude = "51.5072";
@@ -377,6 +383,7 @@ module.exports = function (app, blogData) {
     return formattedMessage;
   }
 
+  //Maps API
   app.get("/maps", function (req, res) {
     // Render the maps.ejs file
     res.render("maps.ejs");

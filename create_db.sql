@@ -26,3 +26,17 @@ CREATE TABLE tips (
   userID INT,
   FOREIGN KEY (userID) REFERENCES users(id)
 );
+
+ALTER TABLE tips
+ADD COLUMN upvotes INT NOT NULL DEFAULT 0;
+
+
+# Create the upvotes table
+CREATE TABLE upvotes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  userId INT,
+  tipId INT,
+  UNIQUE KEY unique_upvote (userId, tipId),
+  FOREIGN KEY (userId) REFERENCES users(id),
+  FOREIGN KEY (tipId) REFERENCES tips(id)
+);

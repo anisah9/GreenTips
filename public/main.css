@@ -1,0 +1,167 @@
+/* main.css */
+
+body {
+  font-family: "Arial", sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  color: #009688; /* Teal color */
+}
+
+a {
+  text-decoration: none;
+  color: #333; /* Dark gray color */
+}
+
+/* Navigation styles */
+nav {
+  background-color: #009688;
+  padding: 10px;
+}
+
+nav a {
+  color: #fff; /* White color */
+  margin-right: 10px;
+}
+
+/* Header styles */
+h1 {
+  margin-bottom: 20px;
+}
+
+/* List styles */
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  display: inline;
+  margin-right: 10px;
+}
+
+/* Form styles */
+form {
+  margin-top: 20px;
+}
+
+input,
+textarea {
+  margin-bottom: 10px;
+  padding: 5px;
+}
+
+button {
+  background-color: #009688;
+  color: #fff;
+  padding: 8px 15px;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #00796b; /* Darker teal color on hover */
+}
+
+/* Tip styles */
+div {
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  padding: 10px;
+}
+
+/* Search results styles */
+h2 {
+  color: #009688;
+}
+
+/* Footer styles */
+footer {
+  background-color: #009688;
+  color: #fff;
+  text-align: center;
+  padding: 10px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+/* about.ejs styles */
+.about-content {
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+/* category.ejs styles */
+h1 {
+  text-align: center;
+  color: #009688;
+}
+
+/* login.ejs styles */
+form {
+  max-width: 400px;
+  margin: 20px auto;
+}
+
+/* register.ejs styles */
+form {
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+#message {
+  color: #e53935; /* Red color for error message */
+}
+
+/* searchresults.ejs styles */
+h1 {
+  color: #009688;
+  text-align: center;
+}
+
+/* submitip.ejs styles */
+form {
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+/* tips.ejs styles */
+div {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+/* Responsive styles */
+@media only screen and (max-width: 600px) {
+  form,
+  .about-content,
+  div {
+    max-width: 100%;
+  }
+}
+
+h3 {
+  color: #009688; /* Teal color for tip category */
+  margin-bottom: 5px;
+}
+
+p {
+  color: #333; /* Dark gray color for tip text */
+  margin-bottom: 10px;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+p.submitted-by {
+  margin-top: 10px;
+  color: #777; /* Light gray color for user details */
+}
+
+/* Date and time styles */
+p.created-at {
+  color: #777;
+}

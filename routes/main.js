@@ -1,5 +1,6 @@
 const app = require("../index");
 const bcrypt = require("bcrypt");
+const request = require("request");
 
 module.exports = function (app, blogData) {
   // Handle our routes
@@ -282,5 +283,65 @@ module.exports = function (app, blogData) {
       // Render the search results page
       res.render("searchResults.ejs", { tips, query });
     });
+  });
+
+  app.get("/airpollution", function (req, res) {
+    let apiKey = "1aef0792cad95761fc691e7c8546da70";
+    let latitude = "51.5072";
+    let longitude = "-0.1276";
+    let url = `http://api.openweathermap.org/data/2.5/air_pollution?lat=${latitude}&lon=${longitude}&appid=${apiKey}`;
+
+    // Make a request to the OpenWeatherMap API
+    request(url, function (err, response, body) {
+      if (err) {
+        console.log("error:", err);
+        res.status(500).send("Internal Server Error");
+      } else {
+        // Parse the JSON response
+        const data = JSON.parse(body);
+
+        // Format the air pollution data
+        const formattedData = formatAirPollutionData(data);
+
+        // Send the formatted data as a response
+        res.send(formattedData);
+      }
+    });
+  });
+
+  // Function to format air pollution data
+  function formatAirPollutionData(data) {
+    if (!data || !data.list || data.list.length === 0) {
+      return "No air pollution data available.";
+    }
+
+    const location = data.coord || {};
+    const aqi = data.list[0].main ? data.list[0].main.aqi : "N/A";
+    const components = data.list[0].components || {};
+
+    // Create a formatted message or HTML
+    const formattedMessage = `
+      <h1>Air Pollution Data</h1>
+      <p>Location: ${location.lat}, ${location.lon}</p>
+      <p>Air Quality Index (AQI): ${aqi}</p>
+      <p>Components:</p>
+      <ul>
+        <li>CO: ${components.co || "N/A"}</li>
+        <li>NO: ${components.no || "N/A"}</li>
+        <li>NO2: ${components.no2 || "N/A"}</li>
+        <li>O3: ${components.o3 || "N/A"}</li>
+        <li>SO2: ${components.so2 || "N/A"}</li>
+        <li>PM2.5: ${components.pm2_5 || "N/A"}</li>
+        <li>PM10: ${components.pm10 || "N/A"}</li>
+        <li>NH3: ${components.nh3 || "N/A"}</li>
+      </ul>
+    `;
+
+    return formattedMessage;
+  }
+
+  app.get("/maps", function (req, res) {
+    // Render the maps.ejs file
+    res.render("maps.ejs");
   });
 };

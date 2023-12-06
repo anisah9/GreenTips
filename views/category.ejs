@@ -12,6 +12,7 @@
     <% for (let tip of tips) { %>
     <div>
       <!-- Display tip details -->
+      <h3><%= tip.category %></h3>
       <p><%= tip.text %></p>
 
       <!-- Check if there is an image URL -->
@@ -26,6 +27,10 @@
 
       <!-- Display the name of the user -->
       <p>Submitted by: <%= tip.username %></p>
+
+      <!-- Display the date and time of submission -->
+      <!-- Display the date and time of submission -->
+      <p>Created at: <%= tip.created_at %></p>
 
       <form action="/upvote/<%= tip.id %>" method="post">
         <button type="submit">Upvote</button>

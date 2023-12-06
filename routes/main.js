@@ -12,6 +12,18 @@ module.exports = function (app, blogData) {
     res.render("about.ejs", blogData);
   });
 
+  // Logout
+  app.post("/logout", function (req, res) {
+    // Clear the session
+    req.session.destroy(function (err) {
+      if (err) {
+        console.error("Error logging out:", err);
+        return res.status(500).json({ message: "Internal Server Error" });
+      }
+      res.redirect("/");
+    });
+  });
+
   // Registration Page
   app.get("/register", function (req, res) {
     res.render("register.ejs");
@@ -43,7 +55,7 @@ module.exports = function (app, blogData) {
     const hashedPassword = bcrypt.hashSync(password, 10);
 
     const sql = `INSERT INTO users (firstName, lastName, username, email, password)
-                VALUES (?, ?, ?, ?, ?)`;
+            VALUES (?, ?, ?, ?, ?)`;
 
     db.query(
       sql,
@@ -103,20 +115,14 @@ module.exports = function (app, blogData) {
     });
   });
 
-  app.post("/logout", function (req, res) {
-    req.session.destroy(function (err) {
-      if (err) {
-        console.error("Error logging out", err);
-        return res.status(500).json({ message: "Internal Server Error" });
-      }
-      res.redirect("/");
-    });
-  });
-
   app.get("/submitTip", function (req, res) {
+    // Check if the user is logged in
     if (!req.session.user) {
+      // Redirect to the login page if not logged in
       return res.redirect("/login");
     }
+
+    // Render the "Submit a Tip" page if logged in
     res.render("submitTip.ejs");
   });
 
@@ -126,20 +132,21 @@ module.exports = function (app, blogData) {
     if (!tipCategory || !tipText) {
       return res
         .status(400)
-        .json({ message: "Category and tip text required" });
+        .json({ message: "Category and tip text are required" });
     }
 
     // Get user information from the session
+    console.log("Current user:", req.session.user);
     const currentUser = req.session.user;
 
     if (!currentUser) {
-      // Redirect to login if user is not logged in
+      // Redirect to login if the user is not logged in
       return res.redirect("/login");
     }
 
     // Save the tip to the database, associating it with the current user
-    const sql = `INSERT INTO tips (category, text, image, link, userId) VALUES (?, ?, ?, ?, ?)`;
-    const values = [tipCategory, tipText, tipImage, tipLink, currentUser.id];
+    const sql = `INSERT INTO tips (category, text, image, link, userId, upvotes) VALUES (?, ?, ?, ?, ?, ?)`;
+    const values = [tipCategory, tipText, tipImage, tipLink, currentUser.id, 0];
 
     db.query(sql, values, function (err, result) {
       if (err) {
@@ -148,14 +155,31 @@ module.exports = function (app, blogData) {
       }
 
       console.log("Tip submitted successfully");
-      res.redirect("/tips/" + tipCategory); //Redirect to a page that displays all the tips
+      res.redirect("/tips/" + tipCategory); // Redirect to a page that displays all tips
+    });
+  });
+  // Add a new route to handle tips for a specific category
+  app.get("/tips/:category", function (req, res) {
+    const category = req.params.category;
+
+    // Retrieve tips for the specified category from the database
+    const sql =
+      "SELECT tips.*, users.username FROM tips JOIN users ON tips.userId = users.id WHERE tips.category = ?";
+    db.query(sql, [category], function (err, tips) {
+      if (err) {
+        console.error("Error retrieving tips:", err);
+        return res.status(500).json({ message: "Internal Server Error" });
+      }
+
+      // Render the category page with the retrieved tips
+      res.render("category.ejs", { category, tips });
     });
   });
 
   app.get("/tips", function (req, res) {
-    // Retrieve tips from the database
+    // Retrieve tips with username from the database
     const sql =
-      "SELECT tips.*, users.username FROM tips JOIN users ON tips.userID = users.id";
+      "SELECT tips.*, users.username FROM tips JOIN users ON tips.userId = users.id";
     db.query(sql, function (err, tips) {
       if (err) {
         console.error("Error retrieving tips:", err);
@@ -167,19 +191,77 @@ module.exports = function (app, blogData) {
     });
   });
 
-  // New route to handle tips for a specific category
-  app.get("/tips/:category", function (req, res) {
-    const category = req.params.category;
+  app.post("/upvote/:tipId", function (req, res) {
+    const tipId = req.params.tipId;
 
-    const sql =
-      "SELECT tips.*, users.username FROM tips JOIN users ON tips.userId = users.id WHERE tips.category = ?";
-    db.query(sql, [category], function (err, tips) {
+    // Check if the user is logged in
+    if (!req.session.user) {
+      // Redirect or handle the case when the user is not logged in
+      return res.redirect("/login");
+    }
+
+    const userId = req.session.user.id;
+
+    // Check if the user has already upvoted this tip
+    const checkUpvoteSql =
+      "SELECT * FROM upvotes WHERE userId = ? AND tipId = ?";
+    db.query(checkUpvoteSql, [userId, tipId], function (err, results) {
       if (err) {
-        console.error("Error retrieving tips:", err);
+        console.error("Error checking upvote:", err);
         return res.status(500).json({ message: "Internal Server Error" });
       }
 
-      res.render("category.ejs", { category, tips });
+      if (results.length > 0) {
+        // User has already upvoted this tip
+        console.log("User has already upvoted this tip");
+        return res.redirect(req.get("referer"));
+      }
+
+      // User has not upvoted, proceed with the upvote
+      const upvoteSql = "INSERT INTO upvotes (userId, tipId) VALUES (?, ?)";
+      db.query(upvoteSql, [userId, tipId], function (err, result) {
+        if (err) {
+          console.error("Error upvoting tip:", err);
+          return res.status(500).json({ message: "Internal Server Error" });
+        }
+
+        // Update the upvotes count in the tips table
+        const updateUpvotesSql =
+          "UPDATE tips SET upvotes = upvotes + 1 WHERE id = ?";
+        db.query(updateUpvotesSql, [tipId], function (err, result) {
+          if (err) {
+            console.error("Error updating upvotes count:", err);
+            return res.status(500).json({ message: "Internal Server Error" });
+          }
+
+          // Redirect back to the category page after upvoting
+          res.redirect(req.get("referer"));
+        });
+      });
+    });
+  });
+
+  // Add a new route for handling search requests
+  app.get("/search", function (req, res) {
+    const searchTerm = req.query.q;
+
+    if (!searchTerm) {
+      // If the search term is empty, redirect to the home page
+      return res.redirect("/");
+    }
+
+    // Perform a search in your database based on the searchTerm
+    const searchSql = "SELECT * FROM tips WHERE text LIKE ? OR category LIKE ?";
+    const searchValues = [`%${searchTerm}%`, `%${searchTerm}%`];
+
+    db.query(searchSql, searchValues, function (err, searchResults) {
+      if (err) {
+        console.error("Error during search:", err);
+        return res.status(500).json({ message: "Internal Server Error" });
+      }
+
+      // Render a page with the search results
+      res.render("searchResults.ejs", { searchResults, searchTerm });
     });
   });
 };

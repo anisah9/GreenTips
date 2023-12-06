@@ -1,12 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <link rel="stylesheet" type="text/css" href="main.css" />
     <title>Register</title>
+    <script>
+      function checkPasswords() {
+        var password = document.getElementById("password").value;
+        var confirmPassword = document.getElementById("confirmPassword").value;
+
+        // Check if passwords match
+        if (password !== confirmPassword) {
+          alert("Passwords do not match");
+          return false; // Prevent form submission
+        }
+
+        // Check if password meets requirements (8 characters, at least one uppercase, one number)
+        var passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+        if (!passwordRegex.test(password)) {
+          alert(
+            "Password must be at least 8 characters long and contain at least one uppercase letter and one number"
+          );
+          return false; // Prevent form submission
+        }
+
+        return true; // Continue with form submission
+      }
+
+      function checkUsernameAvailability() {
+        var username = document.getElementById("username").value;
+        var messageElement = document.getElementById("message");
+
+        // Send an asynchronous request to check if the username is available
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/check-username?username=" + username, true);
+
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState == 4) {
+            if (xhr.status == 200) {
+              var response = JSON.parse(xhr.responseText);
+
+              // Update the message based on the server response
+              if (response.exists) {
+                messageElement.textContent =
+                  "Username already in use. Choose another username.";
+              } else {
+                messageElement.textContent = "Username is available!";
+              }
+            } else {
+              console.error("Error checking username availability");
+            }
+          }
+        };
+
+        xhr.send();
+      }
+    </script>
   </head>
   <body>
     <h1>Register</h1>
-    <form action="/register" method="post">
+    <form action="/register" method="post" onsubmit="return checkPasswords()">
       <label for="email">Email:</label>
       <input type="email" id="email" name="email" required />
       <br />
@@ -17,7 +69,13 @@
       <input type="text" id="lastName" name="lastName" required />
       <br />
       <label for="username">Username:</label>
-      <input type="text" id="username" name="username" required />
+      <input
+        type="text"
+        id="username"
+        name="username"
+        required
+        onchange="handleUsernameAvailability()"
+      />
       <br />
       <label for="password">Password:</label>
       <input type="password" id="password" name="password" required />
@@ -29,6 +87,11 @@
         name="confirmPassword"
         required
       />
+
+      <p>
+        Password requirements: at least 8 characters, one uppercase letter, and
+        one number
+      </p>
 
       <br />
       <button type="submit">Register</button>

@@ -1,6 +1,6 @@
 const app = require("../index");
-const bcrypt = require("bcrypt");
 const request = require("request");
+const { check, validationResult } = require("express-validator");
 
 module.exports = function (app, blogData) {
   // Handle our routes
@@ -30,48 +30,89 @@ module.exports = function (app, blogData) {
     res.render("register.ejs");
   });
 
-  // Route for user registration
-  app.post("/register", function (req, res) {
-    const { firstName, lastName, username, email, password, confirmPassword } =
-      req.body;
+  const bcrypt = require("bcrypt");
 
-    if (!username || !password || !firstName || !lastName || !email) {
-      // Return an error response if any field is blank
-      return res.status(400).json({ message: "All fields are required" });
-    }
+  app.post(
+    "/register",
+    [
+      check("email").isEmail().withMessage("Invalid email address"),
+      check("password")
+        .isLength({ min: 8 })
+        .withMessage("Password must be at least 8 characters long")
+        .matches(/^(?=.*[A-Z])(?=.*\d)/)
+        .withMessage(
+          "Password must contain at least one uppercase letter and one number"
+        ),
+    ],
+    function (req, res) {
+      const {
+        firstName,
+        lastName,
+        username,
+        email,
+        password,
+        confirmPassword,
+      } = req.body;
 
-    // Check if passwords match
-    if (password !== confirmPassword) {
-      return res.status(400).json({ message: "Passwords do not match" });
-    }
+      // Check for other required fields
+      if (!username || !password || !firstName || !lastName || !email) {
+        return res.status(400).json({ message: "All fields are required" });
+      }
 
-    // Check if password length is at least 8 characters
-    if (password.length < 8) {
-      return res
-        .status(400)
-        .json({ message: "Password must be at least 8 characters long" });
-    }
+      // Check if passwords match
+      if (password !== confirmPassword) {
+        return res.status(400).json({ message: "Passwords do not match" });
+      }
 
-    // Hash the password before storing it in the database
-    const hashedPassword = bcrypt.hashSync(password, 10);
+      // Check if password length is at least 8 characters
+      if (password.length < 8) {
+        return res
+          .status(400)
+          .json({ message: "Password must be at least 8 characters long" });
+      }
 
-    const sql = `INSERT INTO users (firstName, lastName, username, email, password)
-            VALUES (?, ?, ?, ?, ?)`;
+      // Validate email using express-validator
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ message: errors.array()[0].msg });
+      }
 
-    db.query(
-      sql,
-      [firstName, lastName, username, email, hashedPassword],
-      function (err, result) {
+      // Query the database to check if the username already exists
+      const checkUsernameSql = "SELECT * FROM users WHERE username = ?";
+      db.query(checkUsernameSql, [username], function (err, results) {
         if (err) {
-          console.error("Error during registration:", err);
+          console.error("Error checking username:", err);
           return res.status(500).json({ message: "Internal Server Error" });
         }
 
-        console.log("User registered successfully");
-        res.redirect("/login");
-      }
-    );
-  });
+        if (results.length > 0) {
+          // Username already exists
+          return res.status(400).json({ message: "Username already in use" });
+        }
+
+        // Hash the password before storing it in the database
+        const hashedPassword = bcrypt.hashSync(password, 10);
+
+        // Insert the user into the database
+        const insertUserSql = `INSERT INTO users (firstName, lastName, username, email, password)
+                VALUES (?, ?, ?, ?, ?)`;
+
+        db.query(
+          insertUserSql,
+          [firstName, lastName, username, email, hashedPassword],
+          function (err, result) {
+            if (err) {
+              console.error("Error during registration:", err);
+              return res.status(500).json({ message: "Internal Server Error" });
+            }
+
+            console.log("User registered successfully");
+            res.redirect("/login");
+          }
+        );
+      });
+    }
+  );
 
   // Login Page
   app.get("/login", function (req, res) {
@@ -106,12 +147,12 @@ module.exports = function (app, blogData) {
         } else {
           // Passwords do not match, login failed
           console.log("Incorrect password");
-          res.redirect("/login");
+          res.redirect("/login?error=auth");
         }
       } else {
         // User not found, login failed
         console.log("User not found");
-        res.redirect("/login");
+        res.redirect("/login?error=auth");
       }
     });
   });
@@ -168,9 +209,11 @@ module.exports = function (app, blogData) {
       res.redirect("/tips/" + tipCategory); // Redirect to a page that displays all tips
     });
   });
-  // Add a new route to handle tips for a specific category
   app.get("/tips/:category", function (req, res) {
     const category = req.params.category;
+
+    // Log the category to check if it's correct
+    console.log("Category:", category);
 
     // Retrieve tips for the specified category from the database
     const sql =
@@ -181,40 +224,35 @@ module.exports = function (app, blogData) {
         return res.status(500).json({ message: "Internal Server Error" });
       }
 
+      // Log the result of the database query
+      console.log("Tips data:", tips);
+
       // Render the category page with the retrieved tips
       res.render("category.ejs", { category, tips });
     });
   });
 
-  // app.get("/tips", function (req, res) {
-  //   // Retrieve tips with username from the database
-  //   const sql =
-  //     "SELECT tips.*, users.username FROM tips JOIN users ON tips.userId = users.id";
-  //   db.query(sql, function (err, tips) {
-  //     if (err) {
-  //       console.error("Error retrieving tips:", err);
-  //       return res.status(500).json({ message: "Internal Server Error" });
-  //     }
-
-  //     // Render the tips page with the retrieved tips
-  //     res.render("tips.ejs", { tips });
-  //   });
-  // });
-
   app.get("/tips", function (req, res) {
-    const sortBy = req.query.sortBy || "created_at"; // Default to sorting by creation time
-    const sortOrder = req.query.sortOrder || "DESC"; // Default to descending order
+    const user = req.session.user || null;
+    const sortBy = req.query.sortBy || "created_at";
+    const sortOrder = req.query.sortOrder || "DESC";
 
-    // Perform a query to retrieve tips with sorting
-    const sql = `SELECT *, DATE_FORMAT(created_at, '%M %e, %Y %h:%i %p') AS formattedCreatedAt FROM tips ORDER BY ${sortBy} ${sortOrder}`;
+    const sql = `
+      SELECT tips.*, users.username, DATE_FORMAT(tips.created_at, '%M %e, %Y %h:%i %p') AS formattedCreatedAt
+      FROM tips
+      JOIN users ON tips.userID = users.id
+      ORDER BY ${sortBy} ${sortOrder}
+    `;
+
     db.query(sql, function (err, tips) {
       if (err) {
         console.error("Error retrieving tips:", err);
         return res.status(500).json({ message: "Internal Server Error" });
       }
 
-      // Render the tips page with the retrieved tips
-      res.render("tips.ejs", { tips, sortBy, sortOrder });
+      console.log("Tips data:", tips); // Add this line to check the structure of tips
+
+      res.render("tips.ejs", { tips, sortBy, sortOrder, user });
     });
   });
 
@@ -241,7 +279,10 @@ module.exports = function (app, blogData) {
       if (results.length > 0) {
         // User has already upvoted this tip
         console.log("User has already upvoted this tip");
-        return res.redirect(req.get("referer"));
+        // Display a window alert using JavaScript and redirect back to the previous page
+        return res.send(
+          "<script>alert('You have already upvoted this tip'); window.location.href = document.referrer;</script>"
+        );
       }
 
       // User has not upvoted, proceed with the upvote
@@ -271,8 +312,13 @@ module.exports = function (app, blogData) {
   app.get("/search", function (req, res) {
     const query = req.query.q; // Assuming the search query is passed as a query parameter
 
-    // Perform a search query on the tips table
-    const sql = "SELECT * FROM tips WHERE text LIKE ? OR keywords LIKE ?";
+    // Perform a search query on the tips table with formatted date and time
+    const sql = `
+      SELECT tips.*, users.username, DATE_FORMAT(tips.created_at, '%M %e, %Y %h:%i %p') AS formattedCreatedAt
+      FROM tips
+      JOIN users ON tips.userID = users.id
+      WHERE tips.text LIKE ? OR tips.keywords LIKE ?
+    `;
     const searchQuery = `%${query}%`;
     db.query(sql, [searchQuery, searchQuery], function (err, tips) {
       if (err) {

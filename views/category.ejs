@@ -1,11 +1,101 @@
-<!-- category.ejs -->
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" type="text/css" href="main.css" />
     <title><%= category %> Tips</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f5f5;
+      }
+
+      h1 {
+        text-align: center;
+        color: #009688;
+        margin-top: 20px;
+      }
+
+      div {
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        margin: 20px;
+        padding: 20px;
+      }
+
+      h3 {
+        color: #009688;
+        margin-bottom: 5px;
+      }
+
+      p {
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin-top: 10px;
+      }
+
+      a {
+        color: #009688;
+        text-decoration: none;
+        display: block;
+        margin-top: 10px;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      p.submitted-by {
+        margin-top: 10px;
+        color: #777;
+      }
+
+      p.created-at {
+        color: #777;
+      }
+
+      form {
+        margin-top: 10px;
+      }
+
+      button.upvote-btn {
+        background-color: #009688;
+        color: #fff;
+        padding: 8px 15px;
+        border: none;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+
+      button.upvote-btn:hover {
+        background-color: #00796b;
+      }
+
+      /* New style for the back button */
+      button.back-btn {
+        background-color: #009688;
+        color: #fff;
+        padding: 8px 15px;
+        border: none;
+        cursor: pointer;
+        border-radius: 4px;
+        margin-bottom: 20px; /* Add margin to separate from tips */
+      }
+
+      button.back-btn:hover {
+        background-color: #00796b;
+      }
+    </style>
   </head>
   <body>
+    <a href="javascript:void(0);" class="back-btn" onclick="goBack()">Back</a>
     <h1><%= category %> Eco-Friendly Tips</h1>
 
     <!-- Display tips retrieved from the database for the specified category -->
@@ -15,27 +105,27 @@
       <h3><%= tip.category %></h3>
       <p><%= tip.text %></p>
 
-      <!-- Check if there is an image URL -->
-      <% if (tip.image) { %>
-      <img src="<%= tip.image %>" alt="Tip Image" />
-      <% } %>
-
       <!-- Check if there is a link -->
       <% if (tip.link) { %>
       <a href="<%= tip.link %>" target="_blank">Read more</a>
       <% } %>
 
       <!-- Display the name of the user -->
-      <p>Submitted by: <%= tip.username %></p>
+      <p class="submitted-by">Submitted by: <%= tip.username %></p>
 
       <!-- Display the date and time of submission -->
-      <p>Created at: <%= tip.created_at %></p>
+      <p class="created-at">Created at: <%= tip.created_at %></p>
 
       <form action="/upvote/<%= tip.id %>" method="post">
-        <button type="submit">Upvote</button>
+        <button class="upvote-btn" type="submit">Upvote</button>
       </form>
       <p>Upvotes: <%= tip.upvotes %></p>
     </div>
     <% } %>
+    <script>
+      function goBack() {
+        window.history.back();
+      }
+    </script>
   </body>
 </html>

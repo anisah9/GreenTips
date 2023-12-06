@@ -145,8 +145,17 @@ module.exports = function (app, blogData) {
     }
 
     // Save the tip to the database, associating it with the current user
-    const sql = `INSERT INTO tips (category, text, image, link, userId, upvotes) VALUES (?, ?, ?, ?, ?, ?)`;
-    const values = [tipCategory, tipText, tipImage, tipLink, currentUser.id, 0];
+    const sql = `INSERT INTO tips (category, text, image, link, userId, upvotes, keywords) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+    const values = [
+      tipCategory,
+      tipText,
+      tipImage,
+      tipLink,
+      currentUser.id,
+      0,
+      new Date(),
+      "keyword1, keyword2",
+    ];
 
     db.query(sql, values, function (err, result) {
       if (err) {
@@ -176,10 +185,27 @@ module.exports = function (app, blogData) {
     });
   });
 
+  // app.get("/tips", function (req, res) {
+  //   // Retrieve tips with username from the database
+  //   const sql =
+  //     "SELECT tips.*, users.username FROM tips JOIN users ON tips.userId = users.id";
+  //   db.query(sql, function (err, tips) {
+  //     if (err) {
+  //       console.error("Error retrieving tips:", err);
+  //       return res.status(500).json({ message: "Internal Server Error" });
+  //     }
+
+  //     // Render the tips page with the retrieved tips
+  //     res.render("tips.ejs", { tips });
+  //   });
+  // });
+
   app.get("/tips", function (req, res) {
-    // Retrieve tips with username from the database
-    const sql =
-      "SELECT tips.*, users.username FROM tips JOIN users ON tips.userId = users.id";
+    const sortBy = req.query.sortBy || "created_at"; // Default to sorting by creation time
+    const sortOrder = req.query.sortOrder || "DESC"; // Default to descending order
+
+    // Perform a query to retrieve tips with sorting
+    const sql = `SELECT *, DATE_FORMAT(created_at, '%M %e, %Y %h:%i %p') AS formattedCreatedAt FROM tips ORDER BY ${sortBy} ${sortOrder}`;
     db.query(sql, function (err, tips) {
       if (err) {
         console.error("Error retrieving tips:", err);
@@ -187,7 +213,7 @@ module.exports = function (app, blogData) {
       }
 
       // Render the tips page with the retrieved tips
-      res.render("tips.ejs", { tips });
+      res.render("tips.ejs", { tips, sortBy, sortOrder });
     });
   });
 
@@ -241,27 +267,20 @@ module.exports = function (app, blogData) {
     });
   });
 
-  // Add a new route for handling search requests
   app.get("/search", function (req, res) {
-    const searchTerm = req.query.q;
+    const query = req.query.q; // Assuming the search query is passed as a query parameter
 
-    if (!searchTerm) {
-      // If the search term is empty, redirect to the home page
-      return res.redirect("/");
-    }
-
-    // Perform a search in your database based on the searchTerm
-    const searchSql = "SELECT * FROM tips WHERE text LIKE ? OR category LIKE ?";
-    const searchValues = [`%${searchTerm}%`, `%${searchTerm}%`];
-
-    db.query(searchSql, searchValues, function (err, searchResults) {
+    // Perform a search query on the tips table
+    const sql = "SELECT * FROM tips WHERE text LIKE ? OR keywords LIKE ?";
+    const searchQuery = `%${query}%`;
+    db.query(sql, [searchQuery, searchQuery], function (err, tips) {
       if (err) {
-        console.error("Error during search:", err);
+        console.error("Error performing search:", err);
         return res.status(500).json({ message: "Internal Server Error" });
       }
 
-      // Render a page with the search results
-      res.render("searchResults.ejs", { searchResults, searchTerm });
+      // Render the search results page
+      res.render("searchResults.ejs", { tips, query });
     });
   });
 };

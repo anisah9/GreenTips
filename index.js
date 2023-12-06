@@ -2,6 +2,7 @@
 var express = require("express");
 var ejs = require("ejs");
 var bodyParser = require("body-parser");
+var validator = require("express-validator");
 
 // Create the express application object
 const app = express();

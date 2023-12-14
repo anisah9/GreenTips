@@ -4,12 +4,16 @@
     <title>Google Maps</title>
   </head>
   <body>
-
+    <div>
+      <p>Use the search box below to find places on the map e.g find the nearest recycling centre!:</p>
+      <!-- Add a search input field -->
+      <input type="text" id="place-search" placeholder="Search for places">
+    </div>
     <div id="map" style="height: 400px; width: 100%"></div>
     <script
       async
       defer
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAlP3Vu2HcUFXLEDwt4ag4E1MYpFeYs9BQ&callback=initMap"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAlP3Vu2HcUFXLEDwt4ag4E1MYpFeYs9BQ&libraries=places&callback=initMap"
       onerror="handleMapError()"
     ></script>
 
@@ -23,17 +27,62 @@
       }
 
       // Function to initialize the map
+      // 
+      
       function initMap() {
-        // Coordinates for London
-        const londonLocation = { lat: 51.509865, lng: -0.118092 };
+  const londonLocation = { lat: 51.509865, lng: -0.118092 };
+  const map = new google.maps.Map(document.getElementById("map"), {
+    center: londonLocation,
+    zoom: 12,
+  });
 
-        // Create a map centered at London
-        const map = new google.maps.Map(document.getElementById("map"), {
-          center: londonLocation,
-          zoom: 12, 
-        });
+  const input = document.getElementById("place-search");
+  const searchBox = new google.maps.places.SearchBox(input);
 
+  map.addListener("bounds_changed", function () {
+    searchBox.setBounds(map.getBounds());
+  });
+
+  searchBox.addListener("places_changed", function () {
+    const places = searchBox.getPlaces();
+    if (places.length === 0) {
+      return;
+    }
+
+    const bounds = new google.maps.LatLngBounds();
+    places.forEach(function (place) {
+      if (!place.geometry) {
+        console.log("Returned place contains no geometry");
+        return;
       }
+
+      // Create a marker for each place.
+      const marker = new google.maps.Marker({
+        map: map,
+        title: place.name,
+        position: place.geometry.location,
+      });
+
+      // Create an info window for each marker.
+      const infowindow = new google.maps.InfoWindow({
+        content: `<strong>${place.name}</strong><br>${place.formatted_address}`,
+      });
+
+      // Open the info window when marker is clicked.
+      marker.addListener("click", function () {
+        infowindow.open(map, marker);
+      });
+
+      if (place.geometry.viewport) {
+        bounds.union(place.geometry.viewport);
+      } else {
+        bounds.extend(place.geometry.location);
+      }
+    });
+    map.fitBounds(bounds);
+  });
+}
+
     </script>
   </body>
 </html>

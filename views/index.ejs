@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <title>Welcome to GreenTips</title>
     <link rel="stylesheet" type="text/css" href="main.css" />
   </head>
   <body>
-    <h1>Welcome to the Eco-Friendly Tips Web App</h1>
+    <br />
+    <h1>Welcome to the Eco-Friendly Tips Website</h1>
 
     <!-- Navigation Links -->
     <nav>
@@ -26,6 +28,12 @@
       <a href="/register">Register</a>
       <a href="/login">Login</a>
       <% } %>
+
+      <!-- Search Bar -->
+      <form action="/search" method="get">
+        <input type="text" name="q" placeholder="Search tips..." />
+        <button type="submit">Search</button>
+      </form>
     </nav>
 
     <ul>
@@ -39,9 +47,5 @@
       <li><a href="/tips/travel">Travel</a></li>
       <li><a href="/tips/general">General Tips</a></li>
     </ul>
-    <form action="/search" method="get">
-      <input type="text" name="q" placeholder="Search tips..." />
-      <button type="submit">Search</button>
-    </form>
   </body>
 </html>

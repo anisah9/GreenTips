@@ -2,50 +2,48 @@
 <html>
   <head>
     <title><%= category %> Tips</title>
+    <link rel="stylesheet" type="text/css" href="main.css" />
     <style>
+      /* Paste the provided CSS here */
       body {
         font-family: "Arial", sans-serif;
         margin: 0;
         padding: 0;
-        background-color: #f5f5f5;
       }
 
       h1 {
+        color: #c8a2c8; /* Pastel Purple color */
         text-align: center;
-        color: #009688;
-        margin-top: 20px;
       }
 
+      a.back-btn {
+        text-decoration: none;
+        color: #c8a2c8;
+        display: block;
+        margin-top: 10px;
+        margin-bottom: 20px;
+      }
+
+      /* Tip styles */
       div {
-        background-color: #fff;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        margin: 20px;
-        padding: 20px;
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-bottom: 20px;
       }
 
       h3 {
-        color: #009688;
+        color: #c8a2c8; /* Pastel Purple color for tip category */
         margin-bottom: 5px;
       }
 
       p {
-        color: #333;
+        color: #333; /* Dark gray color for tip text */
         margin-bottom: 10px;
       }
 
-      img {
-        max-width: 100%;
-        height: auto;
-        border-radius: 8px;
-        margin-top: 10px;
-      }
-
       a {
-        color: #009688;
         text-decoration: none;
-        display: block;
-        margin-top: 10px;
+        color: #c8a2c8;
       }
 
       a:hover {
@@ -54,43 +52,30 @@
 
       p.submitted-by {
         margin-top: 10px;
-        color: #777;
+        color: #777; /* Light gray color for user details */
       }
 
+      /* Date and time styles */
       p.created-at {
-        color: #777;
+        color: #777; /* Light gray color for date and time */
       }
 
+      /* Upvote button styles */
       form {
-        margin-top: 10px;
+        display: inline-block;
       }
 
       button.upvote-btn {
-        background-color: #009688;
+        background-color: #c8a2c8; /* Pastel Purple color */
         color: #fff;
         padding: 8px 15px;
         border: none;
         cursor: pointer;
-        border-radius: 4px;
+        margin-right: 10px;
       }
 
       button.upvote-btn:hover {
-        background-color: #00796b;
-      }
-
-      /* New style for the back button */
-      button.back-btn {
-        background-color: #009688;
-        color: #fff;
-        padding: 8px 15px;
-        border: none;
-        cursor: pointer;
-        border-radius: 4px;
-        margin-bottom: 20px; /* Add margin to separate from tips */
-      }
-
-      button.back-btn:hover {
-        background-color: #00796b;
+        background-color: #b08eb0; /* Darker pastel purple color on hover */
       }
     </style>
   </head>

@@ -2,7 +2,7 @@
 
 //How to get into GreenTips
 
-If server is running use the following link [https://www/doc.gold.ac.uk/usr/584]
+If server is running use the following link [www.doc.gold.ac.uk/usr/584]
 
 If there are server issues, download code from github (https://github.com/anisah9/GreenTips.git)
 and do the following in terminal:

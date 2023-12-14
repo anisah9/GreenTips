@@ -21,7 +21,7 @@ module.exports = function (app, blogData) {
         console.error("Error logging out:", err);
         return res.status(500).json({ message: "Internal Server Error" });
       }
-      res.redirect("/");
+      res.redirect("/usr/584/");
     });
   });
 
@@ -107,7 +107,7 @@ module.exports = function (app, blogData) {
             }
 
             console.log("User registered successfully");
-            res.redirect("/login");
+            res.redirect("/usr/584/login");
           }
         );
       });
@@ -143,16 +143,16 @@ module.exports = function (app, blogData) {
           // Passwords match, login successful
           console.log("Login successful");
           req.session.user = results[0]; // Store user data in session
-          res.redirect("/");
+          res.redirect("/usr/584/");
         } else {
           // Passwords do not match, login failed
           console.log("Incorrect password");
-          res.redirect("/login?error=auth");
+          res.redirect("/usr/584/login?error=auth");
         }
       } else {
         // User not found, login failed
         console.log("User not found");
-        res.redirect("/login?error=auth");
+        res.redirect("/usr/584/login?error=auth");
       }
     });
   });
@@ -197,7 +197,7 @@ module.exports = function (app, blogData) {
       }
 
       console.log("Tip submitted successfully");
-      res.redirect("/tips/" + tipCategory); // Redirect to a page that displays all tips
+      res.redirect("/usr/584/tips/" + tipCategory); // Redirect to a page that displays all tips
     });
   });
 
@@ -257,7 +257,7 @@ module.exports = function (app, blogData) {
     // Check if the user is logged in
     if (!req.session.user) {
       // Redirect or handle the case when the user is not logged in
-      return res.redirect("/login");
+      return res.redirect("/usr/584/login");
     }
 
     const userId = req.session.user.id;
